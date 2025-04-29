@@ -1,0 +1,35 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Layout from './components/Layout';
+import PrivateRoute from './components/PrivateRoute';
+import Login from './features/auth/Login';
+import Signup from './features/auth/Signup';
+import ResumeList from './features/resume/ResumeList';
+import ResumeForm from './features/resume/ResumeForm';
+import ResumeDetail from './features/resume/ResumeDetail';
+
+ const  App = ()=> {
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+
+                {/* Protected routes */}
+                <Route element={<PrivateRoute />}>
+                    <Route path="/" element={<Layout />}>
+                        <Route index element={<Navigate to="/resumes" replace />} />
+                        <Route path="resumes" element={<ResumeList />} />
+                        <Route path="resumes/new" element={<ResumeForm />} />
+                        <Route path="resumes/:id" element={<ResumeDetail />} />
+                        <Route path="resumes/:id/edit" element={<ResumeForm />} />
+                    </Route>
+                </Route>
+
+                {/* Catch-all redirect to login */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+        </BrowserRouter>
+    );
+}
+export default App;  // Add this at the bottom
