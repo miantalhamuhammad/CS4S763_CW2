@@ -1,31 +1,41 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    user: JSON.parse(localStorage.getItem('user')) || null,
     token: localStorage.getItem('token') || null,
+    user: null,  // Store user data if available
 };
+
 const authSlice = createSlice({
     name: 'auth',
-    initialState: {
-        token: localStorage.getItem('token') || null,
-        // other user data if needed
-    },
+    initialState,
     reducers: {
         setCredentials: (state, action) => {
-            state.token = action.payload.token;
-            localStorage.setItem('token', action.payload.token);
-
-            // Store other user data if available
-            // state.userId = action.payload.userId;
-            // localStorage.setItem('userId', action.payload.userId);
+            const { token, user } = action.payload;
+            state.token = token;
+            state.user = user;
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));  // Store user data in localStorage
         },
         logout: (state) => {
             state.token = null;
+            state.user = null;
             localStorage.removeItem('token');
+            localStorage.removeItem('user');  // Clear user data from localStorage
+        },
+        loadUserFromStorage: (state) => {
+            const userData = localStorage.getItem('user');
+            try {
+                state.user = userData ? JSON.parse(userData) : null; // Try to parse user data, fallback to null
+            } catch (error) {
+                console.error("Failed to parse user data:", error);
+                state.user = null;
+            }
         },
     },
 });
 
+export const { setCredentials, logout,loadUserFromStorage } = authSlice.actions;
+export default authSlice.reducer;
 // const authSlice = createSlice({
 //     name: 'auth',
 //     initialState,
@@ -45,6 +55,3 @@ const authSlice = createSlice({
 //         },
 //     },
 // });
-
-export const { setCredentials, logout } = authSlice.actions;
-export default authSlice.reducer;

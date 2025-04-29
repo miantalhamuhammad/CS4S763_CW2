@@ -27,6 +27,7 @@ const Login = () => {
             // Create user object from available data
             const userData = {
                 token: response.token,
+                user: response.user,
                 // Add any other user data you might have
                 // email: formData.email,
                 // id: response.userId // if available

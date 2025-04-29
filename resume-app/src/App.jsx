@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import PrivateRoute from './components/PrivateRoute';
@@ -6,9 +7,18 @@ import Signup from './features/auth/Signup';
 import ResumeList from './features/resume/ResumeList';
 import ResumeForm from './features/resume/ResumeForm';
 import ResumeDetail from './features/resume/ResumeDetail';
+import { useDispatch } from 'react-redux';
+import { loadUserFromStorage } from './features/auth/authSlice'; // Import the action
+
 
  const  App = ()=> {
-    return (
+     const dispatch = useDispatch();
+
+     useEffect(() => {
+         dispatch(loadUserFromStorage());  // Dispatch to load user data from localStorage when app starts
+     }, [dispatch]);
+
+     return (
         <BrowserRouter>
             <Routes>
                 {/* Public routes */}

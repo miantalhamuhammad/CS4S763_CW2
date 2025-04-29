@@ -5,6 +5,8 @@ import { createResume } from '../../api/resume';
 import { Box, Button, TextField, Typography, Container, Paper, Grid } from '@mui/material';
 
 const ResumeForm = () => {
+    const { token } = useSelector((state) => state.auth); // Get token from Redux store
+
     const [formData, setFormData] = useState({
         fullName: '',
         phone: '',
@@ -67,7 +69,7 @@ const ResumeForm = () => {
         e.preventDefault();
 
         try {
-            await dispatch(createResume(formData)).unwrap();
+            await dispatch(createResume(formData,token)).unwrap();
             navigate('/resumes');
         } catch (error) {
             // Handle error

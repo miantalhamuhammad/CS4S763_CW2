@@ -20,8 +20,9 @@ exports.signup = async (req, res) => {
 
         // Create JWT token
         const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
+        //token and user in response
+        res.status(201).json({ message: 'User created successfully', token, user: newUser });
 
-        res.status(201).json({ message: 'User created successfully', token });
     } catch (error) {
         res.status(400).json({ message: 'Error creating user'+error, error });
     }
@@ -47,7 +48,7 @@ exports.login = async (req, res) => {
         // Generate JWT token
         const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
 
-        res.status(200).json({ message: 'Login successful', token });
+        res.status(200).json({ message: 'Login successful', token, user: user });
     } catch (error) {
         res.status(400).json({ message: 'Error logging in', error });
     }
