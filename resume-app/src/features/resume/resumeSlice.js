@@ -21,7 +21,9 @@ export const getResumes = createAsyncThunk(
     'resume/getAll',
     async (_, thunkAPI) => {
         try {
-            const token = thunkAPI.getState().auth.user.token;
+            const token = thunkAPI.getState().auth.token;
+            console.log("token");
+            console.log(token);
             return await apiGetResumes(token);
         } catch (error) {
             const message =
@@ -37,7 +39,7 @@ export const createResume = createAsyncThunk(
     'resume/create',
     async (resumeData, thunkAPI) => {
         try {
-            const token = thunkAPI.getState().auth.user.token;
+            const token = thunkAPI.getState().auth.token;
             return await apiCreateResume(resumeData, token);
         } catch (error) {
             const message =
@@ -53,7 +55,7 @@ export const getResumeById = createAsyncThunk(
     'resume/getById',
     async (id, thunkAPI) => {
         try {
-            const token = thunkAPI.getState().auth.user.token;
+            const token = thunkAPI.getState().auth.token;
             return await apiGetResumeById(id, token);
         } catch (error) {
             const message =

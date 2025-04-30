@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getResumes } from '../../api/resume';
+import { getResumes } from './resumeSlice.js'; // Import your thunk
 import {
     Table,
     TableBody,
@@ -20,22 +20,18 @@ import { useNavigate } from 'react-router-dom';
 const ResumeList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { resumes, isLoading } = useSelector((state) => state.resume);
-    const { token } = useSelector((state) => state.auth);
+    // const { resumes, isLoading } = useSelector((state) => state.resume);
+    const { resumes: resumesData, isLoading } = useSelector((state) => state.resume);
+    const resumes = resumesData?.resumes || [];
+
+    const { token } = useSelector((state) => state.auth); // Get token from Redux store
 
     useEffect(() => {
-        const fetchResumes = async () => {
-            try {
-                if (token) {
-                    const data = await getResumes(token);
-                    dispatch({ type: 'resume/getResumes/fulfilled', payload: data });
-                }
-            } catch (error) {
-                dispatch({ type: 'resume/getResumes/rejected', payload: error.message });
-            }
-        };
-
-        fetchResumes();
+        if (token) {
+            const res =  getResumes();
+            console.log("ajkjjk",res);
+            dispatch(res); // Dispatch the getResumes async thunk
+        }
     }, [dispatch, token]);
 
     if (isLoading) {
@@ -76,7 +72,34 @@ const ResumeList = () => {
                                 <TableCell>{resume.fullName}</TableCell>
                                 <TableCell>{resume.phone}</TableCell>
                                 <TableCell>
-                                    {resume.skills?.map(skill => skill.name).join(', ')}
+                                    {resume.skills?.join(', ')} {/* Skills as a comma-separated string */}
+                                </TableCell>
+                                <TableCell>
+                                    {/* Display Education */}
+                                    {resume.education?.length > 0 ? (
+                                        <div>
+                                            {resume.education.map((edu) => (
+                                                <Typography key={edu._id}>
+                                                    {edu.degree} - {edu.year} {/* Example display */}
+                                                </Typography>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <Typography>No Education Info</Typography>
+                                    )}
+
+                                    {/* Display Experience */}
+                                    {resume.experience?.length > 0 ? (
+                                        <div>
+                                            {resume.experience.map((exp) => (
+                                                <Typography key={exp._id}>
+                                                    {exp.company} ({exp.startDate} - {exp.endDate})
+                                                </Typography>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <Typography>No Experience Info</Typography>
+                                    )}
                                 </TableCell>
                                 <TableCell>
                                     <Button
@@ -98,6 +121,7 @@ const ResumeList = () => {
                             </TableRow>
                         ))}
                     </TableBody>
+
                 </Table>
             </TableContainer>
         </Box>
