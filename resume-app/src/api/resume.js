@@ -2,22 +2,19 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3001/api/resumes';
 
+// Get all resumes
+// In your api/resume.js
 export const getResumes = async (token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     };
-
-    try {
-        const response = await axios.get(API_URL, config);
-        console.log(response.data);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+    const response = await axios.get(API_URL, config);
+    return response.data.resumes || response.data; // Handle both cases
 };
 
+// Get single resume
 export const getResumeById = async (id, token) => {
     const config = {
         headers: {
@@ -28,6 +25,7 @@ export const getResumeById = async (id, token) => {
     return response.data;
 };
 
+// Create new resume
 export const createResume = async (resumeData, token) => {
     const config = {
         headers: {
@@ -38,6 +36,7 @@ export const createResume = async (resumeData, token) => {
     return response.data;
 };
 
+// Update resume
 export const updateResume = async (id, resumeData, token) => {
     const config = {
         headers: {
@@ -48,20 +47,13 @@ export const updateResume = async (id, resumeData, token) => {
     return response.data;
 };
 
+// Delete resume
 export const deleteResume = async (id, token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     };
-    const response = await axios.delete(`${API_URL}/${id}`, config);
-    return response.data;
+    await axios.delete(`${API_URL}/${id}`, config);
+    return id;
 };
-
-// export default {
-//     getResumes,
-//     getResumeById,
-//     createResume,
-//     updateResume,
-//     deleteResume,
-// };

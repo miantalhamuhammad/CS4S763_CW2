@@ -1,8 +1,7 @@
-// src/features/resume/ResumeDetail.jsx
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getResumeById } from '../../api/resume';
+import { getResumeById } from './resumeSlice';
 import {
     Box,
     Typography,
@@ -18,62 +17,100 @@ import {
 const ResumeDetail = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
-    const { currentResume, isLoading } = useSelector((state) => state.resume);
+
+    // Access state from Redux store
+    const { currentResume, isLoading, isError, message } = useSelector((state) => state.resume);
 
     useEffect(() => {
         dispatch(getResumeById(id));
     }, [dispatch, id]);
 
+    // Show loading indicator
     if (isLoading) {
-        return <Typography>Loading resume...</Typography>;
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Typography>Loading resume...</Typography>
+            </Box>
+        );
     }
 
-    if (!currentResume) {
-        return <Typography>Resume not found</Typography>;
+    // Show error message if there's any error
+    if (isError) {
+        return (
+            <Box sx={{ mt: 4 }}>
+                <Typography color="error">
+                    {message || 'An error occurred while fetching the resume.'}
+                </Typography>
+            </Box>
+        );
     }
+
+    // Show message if the resume is not found
+    if (!currentResume) {
+        return (
+            <Box sx={{ mt: 4 }}>
+                <Typography>Resume not found</Typography>
+            </Box>
+        );
+    }
+
+    // Extract the resume data (in case it's nested under 'resume' property)
+    const resumeData = currentResume.resume || currentResume;
 
     return (
         <Box sx={{ p: 3 }}>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h4" gutterBottom>
-                    {currentResume.fullName}
+                    {resumeData.fullName}
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom>
-                    Contact: {currentResume.phone}
+                    Contact: {resumeData.phone || 'Not specified'}
                 </Typography>
 
                 <Divider sx={{ my: 2 }} />
 
                 <Typography variant="h6">Skills</Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, my: 2 }}>
-                    {currentResume.skills?.map((skill, index) => (
-                        <Chip key={index} label={skill.name} variant="outlined" />
-                    ))}
+                    {resumeData.skills?.length > 0 ? (
+                        resumeData.skills.map((skill, index) => (
+                            <Chip key={index} label={skill} variant="outlined" />
+                        ))
+                    ) : (
+                        <Typography variant="body2">No skills listed</Typography>
+                    )}
                 </Box>
 
                 <Typography variant="h6">Experience</Typography>
-                <List>
-                    {currentResume.experience?.map((exp, index) => (
-                        <ListItem key={index}>
-                            <ListItemText
-                                primary={`${exp.position} at ${exp.company}`}
-                                secondary={`${exp.startDate} - ${exp.endDate || 'Present'}`}
-                            />
-                        </ListItem>
-                    ))}
-                </List>
+                {resumeData.experience?.length > 0 ? (
+                    <List>
+                        {resumeData.experience.map((exp, index) => (
+                            <ListItem key={index}>
+                                <ListItemText
+                                    primary={`${exp.position || 'Position not specified'} at ${exp.company || 'Company not specified'}`}
+                                    secondary={`${exp.startDate || 'Start date not specified'} - ${exp.endDate || 'Present'}`}
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
+                ) : (
+                    <Typography variant="body2" sx={{ my: 2 }}>No experience listed</Typography>
+                )}
 
                 <Typography variant="h6">Education</Typography>
-                <List>
-                    {currentResume.education?.map((edu, index) => (
-                        <ListItem key={index}>
-                            <ListItemText
-                                primary={edu.degree}
-                                secondary={`${edu.institution} (${edu.year})`}
-                            />
-                        </ListItem>
-                    ))}
-                </List>
+                {resumeData.education?.length > 0 ? (
+                    <List>
+                        {resumeData.education.map((edu, index) => (
+                            <ListItem key={index}>
+                                <ListItemText
+                                    primary={edu.degree || 'Degree not specified'}
+                                    secondary={`${edu.institution || 'Institution not specified'} (${edu.year || 'Year not specified'})`}
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
+                ) : (
+                    <Typography variant="body2" sx={{ my: 2 }}>No education listed</Typography>
+                )}
 
                 <Button
                     variant="contained"

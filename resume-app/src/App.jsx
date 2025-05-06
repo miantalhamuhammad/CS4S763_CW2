@@ -30,9 +30,9 @@ import { loadUserFromStorage } from './features/auth/authSlice'; // Import the a
                     <Route path="/" element={<Layout />}>
                         <Route index element={<Navigate to="/resumes" replace />} />
                         <Route path="resumes" element={<ResumeList />} />
-                        <Route path="resumes/new" element={<ResumeForm />} />
+                        <Route path="/resumes/new" element={<ResumeForm mode="create" />} />
                         <Route path="resumes/:id" element={<ResumeDetail />} />
-                        <Route path="resumes/:id/edit" element={<ResumeForm />} />
+                        <Route path="resumes/:id/edit" element={<ResumeForm mode="edit" />} />
                     </Route>
                 </Route>
 

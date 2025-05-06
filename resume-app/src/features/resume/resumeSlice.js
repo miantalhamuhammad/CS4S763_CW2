@@ -16,15 +16,14 @@ const initialState = {
     message: '',
 };
 
-// Async thunks for resume operations
+// Async thunks
 export const getResumes = createAsyncThunk(
     'resume/getAll',
     async (_, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.token;
-            console.log("token");
-            console.log(token);
-            return await apiGetResumes(token);
+            const response = await apiGetResumes(token);
+            return response;
         } catch (error) {
             const message =
                 (error.response?.data?.message) ||
@@ -67,7 +66,38 @@ export const getResumeById = createAsyncThunk(
     }
 );
 
-// Add similar thunks for update and delete
+export const updateResume = createAsyncThunk(
+    'resume/update',
+    async ({ id, resumeData }, thunkAPI) => {
+        try {
+            const token = thunkAPI.getState().auth.token;
+            return await apiUpdateResume(id, resumeData, token);
+        } catch (error) {
+            const message =
+                (error.response?.data?.message) ||
+                error.message ||
+                error.toString();
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const deleteResume = createAsyncThunk(
+    'resume/delete',
+    async (id, thunkAPI) => {
+        try {
+            const token = thunkAPI.getState().auth.token;
+            await apiDeleteResume(id, token);
+            return id;
+        } catch (error) {
+            const message =
+                (error.response?.data?.message) ||
+                error.message ||
+                error.toString();
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
 
 const resumeSlice = createSlice({
     name: 'resume',
@@ -85,19 +115,30 @@ const resumeSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Get All Resumes
             .addCase(getResumes.pending, (state) => {
                 state.isLoading = true;
             })
+            // .addCase(getResumes.fulfilled, (state, action) => {
+            //     state.isLoading = false;
+            //     state.isSuccess = true;
+            //     state.resumes = action.payload;
+            // })
+            // In your extraReducers
             .addCase(getResumes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                state.resumes = action.payload;
+                // Make sure you're setting the resumes array properly
+                state.resumes = action.payload.resumes || action.payload || [];
             })
             .addCase(getResumes.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.message = action.payload;
+                state.resumes = [];
             })
+
+            // Create Resume
             .addCase(createResume.pending, (state) => {
                 state.isLoading = true;
             })
@@ -111,6 +152,8 @@ const resumeSlice = createSlice({
                 state.isError = true;
                 state.message = action.payload;
             })
+
+            // Get Resume By ID
             .addCase(getResumeById.pending, (state) => {
                 state.isLoading = true;
             })
@@ -122,8 +165,41 @@ const resumeSlice = createSlice({
                 state.isLoading = false;
                 state.isError = true;
                 state.message = action.payload;
+            })
+
+            // Update Resume
+            .addCase(updateResume.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(updateResume.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                state.resumes = state.resumes.map(resume =>
+                    resume._id === action.payload._id ? action.payload : resume
+                );
+                state.currentResume = action.payload;
+            })
+            .addCase(updateResume.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.message = action.payload;
+            })
+
+            // Delete Resume
+            .addCase(deleteResume.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(deleteResume.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                state.resumes = state.resumes.filter(resume => resume._id !== action.payload);
+            })
+            .addCase(deleteResume.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.message = action.payload;
             });
-        // Add similar cases for update and delete
+
     },
 });
 
