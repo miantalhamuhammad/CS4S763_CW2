@@ -68,7 +68,8 @@ const ResumeForm = ({ mode = 'create' }) => {
                         name: resume.fullName || '',
                         contactInfo: {
                             mobile_no: resume.phone || '',
-                            phone: resume.phone || ''
+                            phone: resume.phone || '',
+                            email: resume.email || ''
                         },
                         skills: Array.isArray(resume.skills) && resume.skills.length > 0
                             ? resume.skills.map(skill => ({ name: skill }))
@@ -230,6 +231,7 @@ const ResumeForm = ({ mode = 'create' }) => {
             fullName: formData.name,
             contactInfo: {
                 phone: formData.contactInfo.phone,
+                email: formData.contactInfo.email,
                 mobile_no: formData.contactInfo.mobile_no
             },
             skills: formData.skills.map(skill => skill.name),
@@ -314,6 +316,17 @@ const ResumeForm = ({ mode = 'create' }) => {
                                 label="Full Name"
                                 name="name"
                                 value={formData.name}
+                                onChange={handleChange}
+                                margin="normal"
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Email"
+                                name="contactInfo.email"
+                                value={formData.contactInfo.email}
                                 onChange={handleChange}
                                 margin="normal"
                                 required

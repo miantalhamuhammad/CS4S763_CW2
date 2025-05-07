@@ -14,7 +14,7 @@ exports.createResume = async (req, res) => {
         const userId = decoded.userId;
         const { fullName, contactInfo, skills, experience, education } = req.body;
 
-        const formattedSkills = skills?.map(skill => skill.name);
+        const formattedSkills = skills?.map(skill => skill);//.name);
         const formattedExperience = experience?.map(item => ({
             company: item.company,
             position: item.position,
@@ -31,6 +31,7 @@ exports.createResume = async (req, res) => {
         const newResume = new Resume({
             userId,
             fullName: fullName,
+            email: contactInfo?.email,
             phone: contactInfo?.phone,
             skills: formattedSkills,
             experience: formattedExperience,
@@ -69,7 +70,7 @@ exports.getResumeById = async (req, res) => {
 // Update a resume by ID
 exports.updateResume = async (req, res) => {
     try {
-        const { name, contactInfo, skills, experience, education } = req.body;
+        const { name, contactInfo, skills, experience, education,email } = req.body;
 
         const formattedSkills = skills?.map(skill => skill.name);
         const formattedExperience = experience?.map(item => ({
@@ -89,6 +90,7 @@ exports.updateResume = async (req, res) => {
             req.params.id,
             {
                 fullName: name,
+                email: contactInfo?.email,
                 phone: contactInfo?.mobile_no,
                 skills: formattedSkills,
                 experience: formattedExperience,
